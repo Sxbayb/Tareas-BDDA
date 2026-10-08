@@ -1,0 +1,18 @@
+# Enunciado de la tarea
+Tarea_2_Cassandra.pdf
+
+# Archivos auxiliares de compilacion de LaTeX
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.nav
+*.snm
+*.xdv
