@@ -18,6 +18,7 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{microtype}
+\usepackage{amsmath}
 
 % Codigo y enlaces
 \usepackage{listings}
@@ -85,8 +86,8 @@
 	\begin{tabular}{rl}
 		\textbf{Nombre:} & Sebastián Andrés Santander Martínez\\
 		\textbf{Rol:} & 202373608-2\\[0.5em]
-		\textbf{Nombre:} & Jaime Guzmán\\
-		\textbf{Rol:} & (pendiente)\\
+		\textbf{Nombre:} & Jaime Guzmán Muñoz\\
+		\textbf{Rol:} & 202373524-8\\
 	\end{tabular}
 	\vfill
 	Segundo semestre 2026
@@ -748,9 +749,272 @@ nueva y volver a cargar todos los datos. Por eso el diseño parte de la lista de
 la aplicación y no del modelo de entidades, al revés de lo que se hace en una base relacional.
 
 \section{Parte 3: Comparación, alta disponibilidad y actualización}
+\subsection{Comparación}
+La diferencia existente entre los modelos de datos utilizados en estas dos tecnologías radica principalmente
+en las visiones que se implementan en cada una.
 
+\subsubsection{Documentos embebidos vs Tablas desnormalizadas}
+MongoDB utiliza un modelo jerárquico donde las entidades relacionadas se agrupan en un solo documento.
+Esto permite recuperar toda la información en una única lectura en disco. Por otro lado, Cassandra 
+para consultas complejas sigue una filosofía de \textit{tablas desnormalizadas}. En lugar de anidar 
+profundamente, en Cassandra de ópta por crear múltiples tablas planas donde exista redundancia de datos
+según sea necesario con tal de satisfacer la lectura.
+
+\subsubsection{Flexibilidad de esquema}
+MongoDB posee un esquema dinámico. En esta tecnología es posible tener documentos con estructuras muy distintas 
+entre sí, pudiendo agregar nuevos campos o insertar estructuras dentro de un documento sin afectar a los registros
+existentes. Cassandra tiene una esquema estático, cada columna y su tipo de dato deben estar estrictamente especifícados
+, cualquier alteración estructural requiere modificar la estructura de la tabla general, o incluso requiriendo la
+creación de nuevas tablas, este tipo de esquema es muy similar al utilizado en bases de datos relacionales.
+
+\subsubsection{Claves de partición y clustering}
+En MongoDB se utiliza el \textit{\_id} como identificador único, pero la distribució de los datos a lo largo del 
+clúster depende la Shard Key que se encuentra desligada de este identificador. En Cassandra el modelo de datos 
+depende enteramente de la Clave Primaria. La clave de partición determina en que nodo físico reside el dato, y la
+clave de clustering define el ordenamiento secuencial en el disco dentro de esta misma partición, logrando lecturas 
+extremadamente rápidas.
+
+\subsubsection{Índices}
+Cassandra utiliza la clave de partición como índice primario, si bien admite índices secundarios no se recomienda
+su uso ya que estas son locales en cada nodo y su utilización puede requerir consultar en múltiples nodos o discos, 
+generando problemas de rendimiento si se ocupan en columnas de baja cardinalidad. MongoDB ofrece índices secundarios
+altamente versátiles, permitiendo crear flujos de búsqueda mucho más personalizables y eficientes para algunos casos.
+
+\subsubsection{Consultas no previstas}
+Por la filosofía utilizada en Cassandra, una consulta no prevista es altamente ineficiente ya que esto implicaría no
+tener una tabla preparada para satisfacer la consulta, provocando un escaneo completo de la tabla, colapsando el 
+rendimiento del clúster. MongoDB es excelente para este tipo de consultas, ya que al tener un motor de indexación flexible
+es posible responder de forma fácil a nuevas consultas sin tener que resideñar la base de datos.
+
+\subsubsection{Duplicación de información}
+En MongoDB se fomenta la encapsulación mediante documentos embebidos para reducir la duplicación, acercandose a la normalización
+conceptual, aunque sin las restriccines relacionales. En Cassandra, la duplicación de datos es su principio fundacional. Esto se
+debe a que el espacio en disco es barato, mientras que la latencia de red es costosa, la misma información de un actor se escribe 
+en tantas tablas diferentes como consultas existan para buscarlo.
+
+\subsubsection{Escalabilidad horizontal}
+Cassandra fue diseñada nativamente con una arquitectura \textit{peer-to-peer}, lo que quiere decir que no existe un nodo maestro
+en la topología de Cassandra. Todos los nodos son iguales, lo que permite escalar de forma verdaderamente lineal y sin cuellos de botella
+simplemente añadiendo nodos al anillo. MongoDB escala horizontalmente con una arquitectura de sharding. Este tipo de arquitectura requiere
+de un proceso de balanceo de chunks que puede degradar la escalabilidad horizontal.
+
+\subsubsection{Por qué el diseño de MongoDB no es apropiado para Casandra y su relación con las consultas}
+Si se traslada el modelo jerárquico de MongoDB directamente a Cassandra, se genera una base de datos donde solo se puede buscar un actor
+si ya se conoce su identificador. Debido a la incapacidad de Cassandra para realizar agrupaciones dinámicas o búsquedas eficientes sobre campos 
+no particionados sin afectar la latencia, este modelo basado en entidades colapsa ante requerimientos de filtrado.
+
+En Cassandra, se utiliza un diseño dirigio por las consultas. La relación entre el diseño de las tablas y las consultas esperadas es
+absoluta: la cláusula WHERE de la consulta define la clave de partición. Por lo tanto, mientras en MongoDB se crea una colección de 
+actores y se agregan índices, en Cassandra se diseñan tablas por cada consulta que se busque satisfacer, duplicando los datos para
+garantizar que cada lectura se dirija exactamente al nodo físico que posee la respuesta precalculada.
+
+\subsection{Alta disponibilidad}
+En primer lugar, se verifica la disponibilidad de los nodos.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/estadoNodos.png}
+	\caption{Comprobación del estado de los nodos del clúster.}
+	\label{fig:nodeStatus}
+\end{figure}
+\newpage
+Luego, se aplica un comando de inserción y un comando de consulta.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/primerConsistency.png}
+	\caption{Primer consistencia 1.}
+	\label{fig:firstConsistency}
+\end{figure}
+Tras esta primera ejecución se tuvo éxito en todas las operaciones. Ahora procedemos a bajar un nodo:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/primerNodoAbajo.png}
+	\caption{Nodo Cassandra3 down.}
+	\label{fig:firstDownNode}
+\end{figure}
+Una vez que está inactivo el nodo volvemos a aplicar consistencia de un nodo y las respectivas operaciones de inserción y consulta.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/segundoConsistency.png}
+	\caption{Segunda consistencia 1.}
+\end{figure}
+Se repite el proceso con \textbf{Consistency Quorum;}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/primerConsistencyQuorum.png}
+	\caption{Primera consistencia Quorum.}
+\end{figure}
+Por último, se repite el proceso con \textbf{Consistency ALL;}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/primerConsistencyAll.png}
+	\caption{Primera consistencia All.}
+\end{figure}
+Se puede observar como para este caso la consulta falló.
+
+Ahora bajaremos un nodo más de la topología:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/segundoNodoAbajo.png}
+	\caption{Nodo Cassandra2 down.}
+\end{figure}
+
+Y aplicaremos \textbf{CONSISTENCY ONE;} repitiendo el proceso de inserción y consulta.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/tercerConsistency.png}
+	\caption{Tercera consistencia 1.}
+\end{figure}
+Donde todas las operaciones se realizaron correctamente. Terminaremos repitiendo el proceso aplicando \textbf{CONSISTENCY QUORUM}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/segundoConsistencyQuorum.png}
+	\caption{Segunda consistencia Quorum.}
+\end{figure}
+Y como se puede observar, fallaron ambas operaciones. A modo de resumen se adjunta la siguiente tabla:
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+	\hline
+	\textbf{Nodos disponibles} & \textbf{ONE} & \textbf{QUORUM} & \textbf{ALL} \\ \hline
+	3 & Éxito & Éxito & Éxito \\ \hline
+	2 & Éxito & Éxito & Falla \\ \hline
+	1 & Éxito & Falla & Falla\\ \hline
+\end{tabular}
+\caption{Tabla resumen}
+\end{table}
+\subsubsection{Explicación de los resultados y cálculo de Quórum}
+Para calcular el Quórum se utiliza la fórmula:
+$$
+\left\lfloor \frac{RF}{2} \right\rfloor + 1 
+$$
+Donde $RF$ es el factor de replicación. Para este caso ($RF=3$), el cálculo determina la mayoría estricta de réplicas requeridas:
+$$
+\left\lfloor \frac{3}{2} \right\rfloor + 1 = \left\lfloor 1.5 \right\rfloor + 1 = 1+1=2
+$$
+Esto explica por qué las consultas con CONSISTENCY QUORUM funcionan cuando hay 3 y 2 nodos disponibles, pero fallan cuando solo hay 1 nodo disponible.
+
+Al utilizar CONSISTENCY ONE, el nodo coordinador solo necesita la confirmación de una réplica para dar la operación por válida. Por esta razón el sistema siguió respondiendo aún cuando ya se habian perdido dos nodos.
+
+Al utilizar CONSISTENCY ALL, el coordinador necesita que los 3 nodos respondan. Si tan solo uno de estos nodos se cae, el sistema se vuelve no disponible para esa consulta, sacrificando la tolerancia a fallos para asegurar que se está leyendo la versión más reciente del dato.
+
+Al utilizar CONSISTENCY QUORUM se llega a un balance, se garantiza unalectura fuertemente consistente mientras se tolera la pérdida de una minoria de los nodos de la topología.
+\subsection{Recuperación de nodos}
+Se volvieron a levantar los nodos y se ejecuto un SELECT sobre un dato ingresado en el test anterior, y como se puede apreciar en la imagen se mantuvo el cambio.
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/reinicioNodos.png}
+	\caption{Reinicio de nodos.}
+\end{figure}
+
+\subsubsection{¿Qué es el \textit{hinted handoff}?}
+
+Cassandra replica cada escritura en varios nodos según el factor de replicación (en nuestro caso 3). Si al escribir una 
+de las réplicas está caída o inaccesible, el \textit{coordinador} (el nodo que recibió la petición del cliente) no puede 
+entregarle la mutación en ese momento.
+
+El \textit{hinted handoff} es el mecanismo que evita perder esa escritura para esa réplica: el coordinador guarda 
+localmente una \textit{pista} (\textit{hint}), que contiene la mutación y el identificador del nodo destino. 
+Cuando detecta que el nodo volvió, mediante el protocolo \textit{gossip}, le reenvía las pistas acumuladas y 
+el nodo se pone al día sin intervención manual.
+
+\subsubsection{Escrituras dirigidas a una réplica temporalmente inaccesible}
+
+El flujo es el siguiente:
+\begin{enumerate}[nosep]
+  \item El cliente envía una escritura al coordinador.
+  \item El coordinador la envía a todas las réplicas. Una de ellas, $R_3$, está caída.
+  \item Las réplicas disponibles la aplican. Si se alcanza el nivel de consistencia pedido (por ejemplo \texttt{QUORUM}, 2 de 3), el cliente recibe confirmación de éxito.
+  \item El coordinador almacena una pista para $R_3$ en disco.
+  \item Cuando $R_3$ vuelve, el coordinador le reenvía la pista y $R_3$ aplica la mutación.
+\end{enumerate}
+
+Algunas características importantes:
+\begin{itemize}[nosep]
+  \item \textbf{Ventana limitada.} Las pistas solo se generan mientras el nodo lleve caído menos de \texttt{max\_hint\_window} (por defecto, 3 horas). Pasado ese tiempo el coordinador deja de acumularlas, para no llenar el disco.
+  \item \textbf{No cuenta para la consistencia.} Una pista no equivale a una réplica escrita. Solo con el nivel \texttt{ANY} una pista basta para confirmar la escritura.
+  \item \textbf{Es un mecanismo de mejor esfuerzo.} Si el propio coordinador falla antes de entregar las pistas, o si estas expiran, la réplica queda desactualizada.
+  \item \textbf{Las pistas se reenvían de forma asíncrona}, con un límite de velocidad para no saturar al nodo recién recuperado.
+\end{itemize}
+
+\subsubsection{Función del proceso de \textit{repair}}
+
+El \textit{hinted handoff} cubre solo caídas cortas. El \textit{repair} (\textit{anti-entropy repair}, \texttt{nodetool repair}) es el mecanismo que garantiza la convergencia de las réplicas a largo plazo. Funciona así:
+\begin{itemize}[nosep]
+  \item Cada réplica construye un árbol de Merkle (\textit{hash tree}) de los datos de un rango de tokens.
+  \item Los nodos comparan los árboles y detectan los rangos que difieren.
+  \item Solo se transmiten los datos en desacuerdo, y se conserva en cada réplica la versión más reciente según las marcas de tiempo.
+\end{itemize}
+
+El \textit{repair} corrige las inconsistencias que el \textit{hinted handoff} no pudo evitar: nodos caídos más de \texttt{max\_hint\_window}, pistas perdidas o expiradas, y escrituras que nunca llegaron a alguna réplica. También es necesario para los borrados. Cassandra marca los datos eliminados con \textit{tombstones}, que se descartan tras \texttt{gc\_grace\_seconds} (10 días por defecto). Si una réplica no recibió el borrado y el \textit{tombstone} ya fue purgado en las demás, el dato eliminado puede reaparecer. Por eso se recomienda ejecutar el \textit{repair} al menos una vez dentro de ese plazo.
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Hinted handoff} & \textbf{Repair} \\
+\midrule
+Cuándo actúa & Durante la escritura, ante un fallo & Periódicamente o por demanda \\
+Alcance & Caídas cortas & Cualquier divergencia \\
+Quién lo hace & El coordinador, automáticamente & Administrador, con \texttt{nodetool} \\
+Garantía & Mejor esfuerzo & Convergencia completa \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Relación entre replicación y tolerancia a fallos}
+
+La replicación es la base de la tolerancia a fallos en Cassandra: al guardar $RF$ copias de cada dato en nodos distintos, el sistema sigue funcionando aunque algunos nodos fallen, sin un punto único de falla. Con $RF=3$ y nivel \texttt{QUORUM}, que exige $\lfloor RF/2 \rfloor + 1 = 2$ respuestas, el clúster tolera la caída de una réplica por rango de tokens sin perder disponibilidad ni lecturas consistentes, ya que se cumple $R + W > RF$ (por ejemplo, $2 + 2 > 3$).
+
+Estos mecanismos se complementan para lograr \textbf{consistencia eventual}:
+\begin{itemize}[nosep]
+  \item La \textbf{replicación} y el nivel de consistencia determinan cuántos fallos se toleran.
+  \item El \textit{hinted handoff} recupera rápidamente a una réplica tras una caída corta.
+  \item El \textit{read repair} corrige divergencias detectadas al leer.
+  \item El \textit{repair} completo restablece la consistencia entre todas las réplicas.
+\end{itemize}
+
+En términos del teorema CAP, esta combinación corresponde a un diseño orientado a disponibilidad y tolerancia a particiones (AP): permite seguir escribiendo con nodos caídos y confía en estos mecanismos para que las réplicas converjan después.
+
+\subsection{Actualización y datos desnormalizados}
+Se incluye un archivo llamado \texttt{evidencia.txt} en donde se realizan 3 consultas pre-actualización y 3 consultas post-actualización 
+en donde se pueden ver reflejados los cambios que realizo la actualización.
+
+Para llevar a cabo la actualización basta con ejecutar los siguientes comandos:
+\begin{lstlisting}
+docker cp actualizacion.cql cassandra1:/tmp/actualizacion.cql
+
+docker exec -it cassandra1 cqlsh -f /tmp/actualizacion.cql | tee evidencia.txt
+\end{lstlisting}
+Es importante notar que \texttt{tee evidencia.txt} será necesario para obtener el archivo de texto con las evidencias.
+
+\subsubsection{Por qué la desnormalización dificulta las actualizaciones}
+En Cassandra cada consulta tiene su tabla, así que un mismo dato vive en varias. Aquí \textit{patrimonio} está en \textit{actors\_by\_id} y en \textit{actors\_by\_nationality}. Cassandra
+no tiene joins ni claves foráneas, por lo que la aplicación debe escribir en todas las copias. Esto introduce 3 problemas:
+\begin{itemize}
+	\item Si una escritura falla o se omite, las copias quedan inconsistentes.
+	\item Para actualizar \texttt{actors\_by\_nationality} hay que conocer nacionalidad, edad y actor\_id. Primero se debe leer actors\_by\_id para obtenerlos, porque no se puede hacer UPDATE ... en esa tabla.
+	\item Si un dato fuera parte de la clave no se podría modificar. Habría que borrar la fila e insertarla de nuevo.
+\end{itemize}
+
+\subsubsection{Qué ventaja entrega}
+Cada consulta se resuelve leyendo una sola partición, sin joins ni filtros. Las lecturas son rápidas y escalan de forma predecible, a costa de escrituras más complejas y de más almacenamiento.
+
+\subsubsection{Uso de BATCH}
+Si conviene usar BATCH para miles o millones de actualizaciones. Depende de qué se agrupe:
+\begin{itemize}
+	\item \textbf{Sí, para agrupar las escrituras de un mismo actor}. Un BATCH LOGGED las vuelve atómicas, lo que mantiene consistentes las tablas desnormalizadas.
+	\item \textbf{No, para agrupar miles o millones de actualizaciones distintas}. Un BATCH no acelera nada. Si abarca muchas particiones, el coordinador debe contactar a muchos nodos, y el batch log agrega escrituras extras. Los batches grandes sobrecargan al coordinador y pueden superar ciertos límites establecidos, así que pueden fallar.
+	\item Para carga masiva conviene ejecutar muchas sentencias preparadas individuales y de forma asíncrona y concurrente, con un límite de concurrencia. Un UNLOGGED BATCH solo sirve cuando todas las sentencias van a la misma partición.
+\end{itemize}
 \section{Parte 4: Cierre}
-
+Como todo lo que empieza tiene que acabar, se ejecuta el siguiente comando para eliminar el KEYSPACE y dejar todo como en su punto inicial.
+\begin{lstlisting}
+DROP KEYSPACE actors;
+\end{lstlisting}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/drop.png}
+	\caption{DROP KEYSPACE.}
+\end{figure}
 \section{Referencias y material complementario}
 
 \begin{itemize}

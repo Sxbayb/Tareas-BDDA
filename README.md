@@ -2,7 +2,7 @@
 
 **Integrantes:**
 - Sebastián Santander, Rol: 202373608-2
-- Jaime Guzmán, Rol: 
+- Jaime Guzmán, Rol: 202373524-8
 
 
 ## Distribución del trabajo
