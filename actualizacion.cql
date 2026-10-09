@@ -26,8 +26,22 @@ USE actors;
 -- ======================================================================
 SELECT actor_id, nombre, edad, patrimonio FROM actors_by_id;
 SELECT nacionalidad, edad, nombre, patrimonio FROM actors_by_nationality;
+-- Personaje de Sansa Ball Race de cada actor, buscado por clave primaria
+-- (actor_id + rol + apariciones + nombre_personaje), sin ALLOW FILTERING.
 SELECT actor_id, nombre_actor, rol, apariciones, nombre_personaje, produccion
-  FROM characters_by_actor WHERE produccion = 'Sansa Ball Race' ALLOW FILTERING;
+  FROM characters_by_actor
+  WHERE actor_id IN (
+    e7a82c20-e5e6-4f0c-9dd2-84e869616452, 951765da-b212-4b56-9945-2ba0d98d4098, 6a01977b-8873-4737-ace4-048f45d6ac42,
+    a826c069-910a-4842-be37-2c51711166cd, 5479cbec-27e4-47b1-9878-c0bffb8ac7f1, 04ab140e-4144-498c-9c48-387188e6823d,
+    0dbb8889-b167-444f-afc3-2fd32b155455, 8c53765f-4ec0-4954-bf8b-2a6aab74fe57, 1e47caa6-1f68-4c50-9e74-d6502980f7bd,
+    40fc7f1b-5dbe-45b9-8f17-6b347b0dc700, c699d5ef-454b-48f8-9c7e-f9e3caaba2c9, 408e79ea-b3a2-459e-8f15-79f2445db505,
+    8a89cf79-4b98-4f0b-8afc-59d6e61f1bf9, 7e9b56d2-f7ca-4132-a960-199b3982dbf3, adb21095-3bbb-492b-9924-eb8b75750c2b,
+    192f09a9-cfd8-4364-aab4-2bd67528ea79, 7b9b3410-61b1-46f2-972e-6a6d79ef801b, 45e8f721-e301-4e25-b5cf-ef7f85616709,
+    22867c53-f000-4394-b870-e4e1b093e3b4, 3f87175d-9c2a-4dc0-9978-98f0277b5be5, fd6cb580-ce21-426c-9b0c-6bb0cd3e91d5,
+    2e608e3d-5c2e-4826-96f0-a1e4a91a562e, 44a23f65-9015-47c2-8b71-779491e0b539, 38ca6b4a-f85e-4bea-8eec-8bf97875a42b)
+    AND rol IN ('Principal', 'Secundario')
+    AND apariciones IN (1, 3)
+    AND nombre_personaje = 'Sansa';
 SELECT COUNT(*) FROM characters_by_actor;
 
 -- ======================================================================
@@ -207,6 +221,20 @@ APPLY BATCH;
 -- ======================================================================
 SELECT actor_id, nombre, edad, patrimonio FROM actors_by_id;
 SELECT nacionalidad, edad, nombre, patrimonio FROM actors_by_nationality;
+-- Personaje de Sansa Ball Race de cada actor, buscado por clave primaria
+-- (actor_id + rol + apariciones + nombre_personaje), sin ALLOW FILTERING.
 SELECT actor_id, nombre_actor, rol, apariciones, nombre_personaje, produccion
-  FROM characters_by_actor WHERE produccion = 'Sansa Ball Race' ALLOW FILTERING;
+  FROM characters_by_actor
+  WHERE actor_id IN (
+    e7a82c20-e5e6-4f0c-9dd2-84e869616452, 951765da-b212-4b56-9945-2ba0d98d4098, 6a01977b-8873-4737-ace4-048f45d6ac42,
+    a826c069-910a-4842-be37-2c51711166cd, 5479cbec-27e4-47b1-9878-c0bffb8ac7f1, 04ab140e-4144-498c-9c48-387188e6823d,
+    0dbb8889-b167-444f-afc3-2fd32b155455, 8c53765f-4ec0-4954-bf8b-2a6aab74fe57, 1e47caa6-1f68-4c50-9e74-d6502980f7bd,
+    40fc7f1b-5dbe-45b9-8f17-6b347b0dc700, c699d5ef-454b-48f8-9c7e-f9e3caaba2c9, 408e79ea-b3a2-459e-8f15-79f2445db505,
+    8a89cf79-4b98-4f0b-8afc-59d6e61f1bf9, 7e9b56d2-f7ca-4132-a960-199b3982dbf3, adb21095-3bbb-492b-9924-eb8b75750c2b,
+    192f09a9-cfd8-4364-aab4-2bd67528ea79, 7b9b3410-61b1-46f2-972e-6a6d79ef801b, 45e8f721-e301-4e25-b5cf-ef7f85616709,
+    22867c53-f000-4394-b870-e4e1b093e3b4, 3f87175d-9c2a-4dc0-9978-98f0277b5be5, fd6cb580-ce21-426c-9b0c-6bb0cd3e91d5,
+    2e608e3d-5c2e-4826-96f0-a1e4a91a562e, 44a23f65-9015-47c2-8b71-779491e0b539, 38ca6b4a-f85e-4bea-8eec-8bf97875a42b)
+    AND rol IN ('Principal', 'Secundario')
+    AND apariciones IN (1, 3)
+    AND nombre_personaje = 'Sansa';
 SELECT COUNT(*) FROM characters_by_actor;

@@ -757,26 +757,26 @@ en las visiones que se implementan en cada una.
 MongoDB utiliza un modelo jerárquico donde las entidades relacionadas se agrupan en un solo documento.
 Esto permite recuperar toda la información en una única lectura en disco. Por otro lado, Cassandra 
 para consultas complejas sigue una filosofía de \textit{tablas desnormalizadas}. En lugar de anidar 
-profundamente, en Cassandra de ópta por crear múltiples tablas planas donde exista redundancia de datos
+profundamente, en Cassandra se opta por crear múltiples tablas planas donde exista redundancia de datos
 según sea necesario con tal de satisfacer la lectura.
 
 \subsubsection{Flexibilidad de esquema}
 MongoDB posee un esquema dinámico. En esta tecnología es posible tener documentos con estructuras muy distintas 
 entre sí, pudiendo agregar nuevos campos o insertar estructuras dentro de un documento sin afectar a los registros
-existentes. Cassandra tiene una esquema estático, cada columna y su tipo de dato deben estar estrictamente especifícados
-, cualquier alteración estructural requiere modificar la estructura de la tabla general, o incluso requiriendo la
-creación de nuevas tablas, este tipo de esquema es muy similar al utilizado en bases de datos relacionales.
+existentes. Cassandra tiene un esquema estático, cada columna y su tipo de dato deben estar estrictamente especificados.
+Cualquier alteración estructural requiere modificar la estructura de la tabla general, o incluso requiere la
+creación de nuevas tablas. Este tipo de esquema es muy similar al utilizado en bases de datos relacionales.
 
 \subsubsection{Claves de partición y clustering}
-En MongoDB se utiliza el \textit{\_id} como identificador único, pero la distribució de los datos a lo largo del 
-clúster depende la Shard Key que se encuentra desligada de este identificador. En Cassandra el modelo de datos 
-depende enteramente de la Clave Primaria. La clave de partición determina en que nodo físico reside el dato, y la
+En MongoDB se utiliza el \textit{\_id} como identificador único, pero la distribución de los datos a lo largo del 
+clúster depende de la Shard Key que se encuentra desligada de este identificador. En Cassandra el modelo de datos 
+depende enteramente de la Clave Primaria. La clave de partición determina en qué nodo físico reside el dato, y la
 clave de clustering define el ordenamiento secuencial en el disco dentro de esta misma partición, logrando lecturas 
 extremadamente rápidas.
 
 \subsubsection{Índices}
 Cassandra utiliza la clave de partición como índice primario, si bien admite índices secundarios no se recomienda
-su uso ya que estas son locales en cada nodo y su utilización puede requerir consultar en múltiples nodos o discos, 
+su uso ya que estos son locales en cada nodo y su utilización puede requerir consultar en múltiples nodos o discos, 
 generando problemas de rendimiento si se ocupan en columnas de baja cardinalidad. MongoDB ofrece índices secundarios
 altamente versátiles, permitiendo crear flujos de búsqueda mucho más personalizables y eficientes para algunos casos.
 
@@ -784,11 +784,11 @@ altamente versátiles, permitiendo crear flujos de búsqueda mucho más personal
 Por la filosofía utilizada en Cassandra, una consulta no prevista es altamente ineficiente ya que esto implicaría no
 tener una tabla preparada para satisfacer la consulta, provocando un escaneo completo de la tabla, colapsando el 
 rendimiento del clúster. MongoDB es excelente para este tipo de consultas, ya que al tener un motor de indexación flexible
-es posible responder de forma fácil a nuevas consultas sin tener que resideñar la base de datos.
+es posible responder de forma fácil a nuevas consultas sin tener que rediseñar la base de datos.
 
 \subsubsection{Duplicación de información}
-En MongoDB se fomenta la encapsulación mediante documentos embebidos para reducir la duplicación, acercandose a la normalización
-conceptual, aunque sin las restriccines relacionales. En Cassandra, la duplicación de datos es su principio fundacional. Esto se
+En MongoDB se fomenta la encapsulación mediante documentos embebidos para reducir la duplicación, acercándose a la normalización
+conceptual, aunque sin las restricciones relacionales. En Cassandra, la duplicación de datos es su principio fundacional. Esto se
 debe a que el espacio en disco es barato, mientras que la latencia de red es costosa, la misma información de un actor se escribe 
 en tantas tablas diferentes como consultas existan para buscarlo.
 
@@ -798,12 +798,12 @@ en la topología de Cassandra. Todos los nodos son iguales, lo que permite escal
 simplemente añadiendo nodos al anillo. MongoDB escala horizontalmente con una arquitectura de sharding. Este tipo de arquitectura requiere
 de un proceso de balanceo de chunks que puede degradar la escalabilidad horizontal.
 
-\subsubsection{Por qué el diseño de MongoDB no es apropiado para Casandra y su relación con las consultas}
+\subsubsection{Por qué el diseño de MongoDB no es apropiado para Cassandra y su relación con las consultas}
 Si se traslada el modelo jerárquico de MongoDB directamente a Cassandra, se genera una base de datos donde solo se puede buscar un actor
 si ya se conoce su identificador. Debido a la incapacidad de Cassandra para realizar agrupaciones dinámicas o búsquedas eficientes sobre campos 
 no particionados sin afectar la latencia, este modelo basado en entidades colapsa ante requerimientos de filtrado.
 
-En Cassandra, se utiliza un diseño dirigio por las consultas. La relación entre el diseño de las tablas y las consultas esperadas es
+En Cassandra, se utiliza un diseño dirigido por las consultas. La relación entre el diseño de las tablas y las consultas esperadas es
 absoluta: la cláusula WHERE de la consulta define la clave de partición. Por lo tanto, mientras en MongoDB se crea una colección de 
 actores y se agregan índices, en Cassandra se diseñan tablas por cada consulta que se busque satisfacer, duplicando los datos para
 garantizar que cada lectura se dirija exactamente al nodo físico que posee la respuesta precalculada.
@@ -893,13 +893,13 @@ $$
 $$
 Esto explica por qué las consultas con CONSISTENCY QUORUM funcionan cuando hay 3 y 2 nodos disponibles, pero fallan cuando solo hay 1 nodo disponible.
 
-Al utilizar CONSISTENCY ONE, el nodo coordinador solo necesita la confirmación de una réplica para dar la operación por válida. Por esta razón el sistema siguió respondiendo aún cuando ya se habian perdido dos nodos.
+Al utilizar CONSISTENCY ONE, el nodo coordinador solo necesita la confirmación de una réplica para dar la operación por válida. Por esta razón el sistema siguió respondiendo aún cuando ya se habían perdido dos nodos.
 
 Al utilizar CONSISTENCY ALL, el coordinador necesita que los 3 nodos respondan. Si tan solo uno de estos nodos se cae, el sistema se vuelve no disponible para esa consulta, sacrificando la tolerancia a fallos para asegurar que se está leyendo la versión más reciente del dato.
 
-Al utilizar CONSISTENCY QUORUM se llega a un balance, se garantiza unalectura fuertemente consistente mientras se tolera la pérdida de una minoria de los nodos de la topología.
+Al utilizar CONSISTENCY QUORUM se llega a un balance, se garantiza una lectura fuertemente consistente mientras se tolera la pérdida de una minoría de los nodos de la topología.
 \subsection{Recuperación de nodos}
-Se volvieron a levantar los nodos y se ejecuto un SELECT sobre un dato ingresado en el test anterior, y como se puede apreciar en la imagen se mantuvo el cambio.
+Se volvieron a levantar los nodos y se ejecutó un SELECT sobre un dato ingresado en el test anterior, y como se puede apreciar en la imagen se mantuvo el cambio.
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{img/reinicioNodos.png}
@@ -976,7 +976,7 @@ En términos del teorema CAP, esta combinación corresponde a un diseño orienta
 
 \subsection{Actualización y datos desnormalizados}
 Se incluye un archivo llamado \texttt{evidencia.txt} en donde se realizan 3 consultas pre-actualización y 3 consultas post-actualización 
-en donde se pueden ver reflejados los cambios que realizo la actualización.
+en donde se pueden ver reflejados los cambios que realizó la actualización.
 
 Para llevar a cabo la actualización basta con ejecutar los siguientes comandos:
 \begin{lstlisting}
@@ -986,12 +986,20 @@ docker exec -it cassandra1 cqlsh -f /tmp/actualizacion.cql | tee evidencia.txt
 \end{lstlisting}
 Es importante notar que \texttt{tee evidencia.txt} será necesario para obtener el archivo de texto con las evidencias.
 
+Como CQL no permite operaciones aritméticas dentro de un UPDATE (no existe \texttt{SET patrimonio = patrimonio * 1.32}),
+el nuevo patrimonio de cada actor se calculó como su patrimonio actual multiplicado por 1,32 y se escribió como valor
+fijo en el script. Todos los patrimonios son múltiplos de 1000, así que el resultado es exacto.
+
+En la evidencia, \texttt{actors\_by\_id} muestra 27 filas y no 24. Las tres filas extra (Claire Dubois, Laura Gómez y
+Jose Ignacio Álvarez) se insertaron durante las pruebas de alta disponibilidad, no forman parte de los datos de la tarea
+y por eso no se incluyeron en la actualización.
+
 \subsubsection{Por qué la desnormalización dificulta las actualizaciones}
 En Cassandra cada consulta tiene su tabla, así que un mismo dato vive en varias. Aquí \textit{patrimonio} está en \textit{actors\_by\_id} y en \textit{actors\_by\_nationality}. Cassandra
 no tiene joins ni claves foráneas, por lo que la aplicación debe escribir en todas las copias. Esto introduce 3 problemas:
 \begin{itemize}
 	\item Si una escritura falla o se omite, las copias quedan inconsistentes.
-	\item Para actualizar \texttt{actors\_by\_nationality} hay que conocer nacionalidad, edad y actor\_id. Primero se debe leer actors\_by\_id para obtenerlos, porque no se puede hacer UPDATE ... en esa tabla.
+	\item Para actualizar \texttt{actors\_by\_nationality} hay que conocer nacionalidad, edad y actor\_id. Primero se debe leer actors\_by\_id para obtenerlos, porque en esa tabla un UPDATE exige la clave primaria completa.
 	\item Si un dato fuera parte de la clave no se podría modificar. Habría que borrar la fila e insertarla de nuevo.
 \end{itemize}
 
@@ -999,7 +1007,7 @@ no tiene joins ni claves foráneas, por lo que la aplicación debe escribir en t
 Cada consulta se resuelve leyendo una sola partición, sin joins ni filtros. Las lecturas son rápidas y escalan de forma predecible, a costa de escrituras más complejas y de más almacenamiento.
 
 \subsubsection{Uso de BATCH}
-Si conviene usar BATCH para miles o millones de actualizaciones. Depende de qué se agrupe:
+¿Conviene usar BATCH para miles o millones de actualizaciones? Depende de qué se agrupe:
 \begin{itemize}
 	\item \textbf{Sí, para agrupar las escrituras de un mismo actor}. Un BATCH LOGGED las vuelve atómicas, lo que mantiene consistentes las tablas desnormalizadas.
 	\item \textbf{No, para agrupar miles o millones de actualizaciones distintas}. Un BATCH no acelera nada. Si abarca muchas particiones, el coordinador debe contactar a muchos nodos, y el batch log agrega escrituras extras. Los batches grandes sobrecargan al coordinador y pueden superar ciertos límites establecidos, así que pueden fallar.

@@ -16,3 +16,6 @@ Tarea_2_Cassandra.pdf
 *.nav
 *.snm
 *.xdv
+
+# Archivo comprimido de la entrega en Aula
+*.zip

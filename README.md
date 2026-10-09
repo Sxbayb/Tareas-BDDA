@@ -22,6 +22,8 @@
 - `generar_datos.py`: genera datos ficticios mediante la biblioteca Faker.
 - `datos.cql`: los INSERT de los 24 actores utilizados en la tarea.
 - `consultas_p1_p2.cql`: consultas de la Parte 1 y la Parte 2.
+- `actualizacion.cql`: actualización masiva de la Parte 3 (patrimonio y "Sansa Ball Race").
+- `evidencia.txt`: salida de `actualizacion.cql` con las consultas antes y después.
 - `docker-compose.yml`: configuración de los tres nodos de Cassandra.
 - `img/`: capturas utilizadas en el informe.
 
