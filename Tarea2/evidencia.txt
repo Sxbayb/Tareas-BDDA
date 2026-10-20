@@ -1,0 +1,177 @@
+
+ actor_id                             | nombre                            | edad | patrimonio
+--------------------------------------+-----------------------------------+------+------------
+ 8c53765f-4ec0-4954-bf8b-2a6aab75fe68 |              Jose Ignacio Álvarez |   22 |    9557000
+ 323e4567-e89b-12d3-a456-426614174003 |                     Claire Dubois |   25 |    2100000
+ 6a01977b-8873-4737-ace4-048f45d6ac42 | Catalina Camila Cáceres Dinamarca |   38 |    6961000
+ 123e4567-e89b-12d3-a456-426614174001 |                       Laura Gómez |   31 |    4500000
+ 1e47caa6-1f68-4c50-9e74-d6502980f7bd |       Julio Pierre Tapia Gallardo |   45 |    2219000
+ 04ab140e-4144-498c-9c48-387188e6823d |                         Brayan Sá |   55 |   10012000
+ c699d5ef-454b-48f8-9c7e-f9e3caaba2c9 |        Carla Noemí Melgar Narváez |   36 |   10813000
+ adb21095-3bbb-492b-9924-eb8b75750c2b |  María Julieta Hernández Calderón |   34 |     939000
+ 7e9b56d2-f7ca-4132-a960-199b3982dbf3 |                 Christopher Braun |   44 |    7063000
+ 192f09a9-cfd8-4364-aab4-2bd67528ea79 |                Andy Castro Aliaga |   27 |    3149000
+ 408e79ea-b3a2-459e-8f15-79f2445db505 |          Florencio Ribera Tamarit |   25 |    8062000
+ 44a23f65-9015-47c2-8b71-779491e0b539 |         Mia Ana Alarcón Rodríguez |   39 |    1140000
+ 951765da-b212-4b56-9945-2ba0d98d4098 |        Daniel Joaquín Villar Mena |   58 |   10992000
+ 40fc7f1b-5dbe-45b9-8f17-6b347b0dc700 |                  Julie Richardson |   30 |    8543000
+ 45e8f721-e301-4e25-b5cf-ef7f85616709 |                  Katherine Taylor |   49 |    2509000
+ 2e608e3d-5c2e-4826-96f0-a1e4a91a562e |          Constantino Guzman Lopez |   33 |    4368000
+ 3f87175d-9c2a-4dc0-9978-98f0277b5be5 | Alejandro Benavides-Gálvez Molina |   70 |   10258000
+ fd6cb580-ce21-426c-9b0c-6bb0cd3e91d5 |                   William Sanchez |   67 |     987000
+ 0dbb8889-b167-444f-afc3-2fd32b155455 |                 Melanie Gutierrez |   40 |   10353000
+ 7b9b3410-61b1-46f2-972e-6a6d79ef801b |                  Kathryn Robinson |   61 |     707000
+ 38ca6b4a-f85e-4bea-8eec-8bf97875a42b |                  Uberlinda Lizana |   52 |    6688000
+ e7a82c20-e5e6-4f0c-9dd2-84e869616452 |     María Patricia González Silva |   41 |   11386000
+ 22867c53-f000-4394-b870-e4e1b093e3b4 |       Rosa Angélica Uribe Álvarez |   31 |    6994000
+ 8a89cf79-4b98-4f0b-8afc-59d6e61f1bf9 |    Sergio Anderson Osorio Bastías |   63 |   10763000
+ a826c069-910a-4842-be37-2c51711166cd |             Lorenzo Ignacio Gomez |   22 |    4515000
+ 8c53765f-4ec0-4954-bf8b-2a6aab74fe57 |     Josefa Brenda Alarcón Álvarez |   23 |    4557000
+ 5479cbec-27e4-47b1-9878-c0bffb8ac7f1 |                       Terri Clark |   28 |   11178000
+
+(27 rows)
+
+ nacionalidad   | edad | nombre                            | patrimonio
+----------------+------+-----------------------------------+------------
+         Brasil |   55 |                         Brayan Sá |   10012000
+          Chile |   23 |     Josefa Brenda Alarcón Álvarez |    4557000
+          Chile |   27 |                Andy Castro Aliaga |    3149000
+          Chile |   31 |       Rosa Angélica Uribe Álvarez |    6994000
+          Chile |   34 |  María Julieta Hernández Calderón |     939000
+          Chile |   38 | Catalina Camila Cáceres Dinamarca |    6961000
+          Chile |   39 |         Mia Ana Alarcón Rodríguez |    1140000
+          Chile |   41 |     María Patricia González Silva |   11386000
+          Chile |   45 |       Julio Pierre Tapia Gallardo |    2219000
+          Chile |   52 |                  Uberlinda Lizana |    6688000
+          Chile |   58 |        Daniel Joaquín Villar Mena |   10992000
+          Chile |   63 |    Sergio Anderson Osorio Bastías |   10763000
+          Chile |   70 | Alejandro Benavides-Gálvez Molina |   10258000
+ Estados Unidos |   28 |                       Terri Clark |   11178000
+ Estados Unidos |   30 |                  Julie Richardson |    8543000
+ Estados Unidos |   40 |                 Melanie Gutierrez |   10353000
+ Estados Unidos |   44 |                 Christopher Braun |    7063000
+ Estados Unidos |   49 |                  Katherine Taylor |    2509000
+ Estados Unidos |   61 |                  Kathryn Robinson |     707000
+ Estados Unidos |   67 |                   William Sanchez |     987000
+         Mexico |   36 |        Carla Noemí Melgar Narváez |   10813000
+      Argentina |   22 |             Lorenzo Ignacio Gomez |    4515000
+      Argentina |   33 |          Constantino Guzman Lopez |    4368000
+         España |   25 |          Florencio Ribera Tamarit |    8062000
+
+(24 rows)
+
+ actor_id | nombre_actor | rol | apariciones | nombre_personaje | produccion
+----------+--------------+-----+-------------+------------------+------------
+
+
+(0 rows)
+
+ count
+-------
+    66
+
+(1 rows)
+
+Warnings :
+Aggregation query used without partition key
+
+
+ actor_id                             | nombre                            | edad | patrimonio
+--------------------------------------+-----------------------------------+------+------------
+ 8c53765f-4ec0-4954-bf8b-2a6aab75fe68 |              Jose Ignacio Álvarez |   22 |    9557000
+ 323e4567-e89b-12d3-a456-426614174003 |                     Claire Dubois |   25 |    2100000
+ 6a01977b-8873-4737-ace4-048f45d6ac42 | Catalina Camila Cáceres Dinamarca |   38 |    9188520
+ 123e4567-e89b-12d3-a456-426614174001 |                       Laura Gómez |   31 |    4500000
+ 1e47caa6-1f68-4c50-9e74-d6502980f7bd |       Julio Pierre Tapia Gallardo |   45 |    2929080
+ 04ab140e-4144-498c-9c48-387188e6823d |                         Brayan Sá |   55 |   13215840
+ c699d5ef-454b-48f8-9c7e-f9e3caaba2c9 |        Carla Noemí Melgar Narváez |   36 |   14273160
+ adb21095-3bbb-492b-9924-eb8b75750c2b |  María Julieta Hernández Calderón |   34 |    1239480
+ 7e9b56d2-f7ca-4132-a960-199b3982dbf3 |                 Christopher Braun |   44 |    9323160
+ 192f09a9-cfd8-4364-aab4-2bd67528ea79 |                Andy Castro Aliaga |   27 |    4156680
+ 408e79ea-b3a2-459e-8f15-79f2445db505 |          Florencio Ribera Tamarit |   25 |   10641840
+ 44a23f65-9015-47c2-8b71-779491e0b539 |         Mia Ana Alarcón Rodríguez |   39 |    1504800
+ 951765da-b212-4b56-9945-2ba0d98d4098 |        Daniel Joaquín Villar Mena |   58 |   14509440
+ 40fc7f1b-5dbe-45b9-8f17-6b347b0dc700 |                  Julie Richardson |   30 |   11276760
+ 45e8f721-e301-4e25-b5cf-ef7f85616709 |                  Katherine Taylor |   49 |    3311880
+ 2e608e3d-5c2e-4826-96f0-a1e4a91a562e |          Constantino Guzman Lopez |   33 |    5765760
+ 3f87175d-9c2a-4dc0-9978-98f0277b5be5 | Alejandro Benavides-Gálvez Molina |   70 |   13540560
+ fd6cb580-ce21-426c-9b0c-6bb0cd3e91d5 |                   William Sanchez |   67 |    1302840
+ 0dbb8889-b167-444f-afc3-2fd32b155455 |                 Melanie Gutierrez |   40 |   13665960
+ 7b9b3410-61b1-46f2-972e-6a6d79ef801b |                  Kathryn Robinson |   61 |     933240
+ 38ca6b4a-f85e-4bea-8eec-8bf97875a42b |                  Uberlinda Lizana |   52 |    8828160
+ e7a82c20-e5e6-4f0c-9dd2-84e869616452 |     María Patricia González Silva |   41 |   15029520
+ 22867c53-f000-4394-b870-e4e1b093e3b4 |       Rosa Angélica Uribe Álvarez |   31 |    9232080
+ 8a89cf79-4b98-4f0b-8afc-59d6e61f1bf9 |    Sergio Anderson Osorio Bastías |   63 |   14207160
+ a826c069-910a-4842-be37-2c51711166cd |             Lorenzo Ignacio Gomez |   22 |    5959800
+ 8c53765f-4ec0-4954-bf8b-2a6aab74fe57 |     Josefa Brenda Alarcón Álvarez |   23 |    6015240
+ 5479cbec-27e4-47b1-9878-c0bffb8ac7f1 |                       Terri Clark |   28 |   14754960
+
+(27 rows)
+
+ nacionalidad   | edad | nombre                            | patrimonio
+----------------+------+-----------------------------------+------------
+         Brasil |   55 |                         Brayan Sá |   13215840
+          Chile |   23 |     Josefa Brenda Alarcón Álvarez |    6015240
+          Chile |   27 |                Andy Castro Aliaga |    4156680
+          Chile |   31 |       Rosa Angélica Uribe Álvarez |    9232080
+          Chile |   34 |  María Julieta Hernández Calderón |    1239480
+          Chile |   38 | Catalina Camila Cáceres Dinamarca |    9188520
+          Chile |   39 |         Mia Ana Alarcón Rodríguez |    1504800
+          Chile |   41 |     María Patricia González Silva |   15029520
+          Chile |   45 |       Julio Pierre Tapia Gallardo |    2929080
+          Chile |   52 |                  Uberlinda Lizana |    8828160
+          Chile |   58 |        Daniel Joaquín Villar Mena |   14509440
+          Chile |   63 |    Sergio Anderson Osorio Bastías |   14207160
+          Chile |   70 | Alejandro Benavides-Gálvez Molina |   13540560
+ Estados Unidos |   28 |                       Terri Clark |   14754960
+ Estados Unidos |   30 |                  Julie Richardson |   11276760
+ Estados Unidos |   40 |                 Melanie Gutierrez |   13665960
+ Estados Unidos |   44 |                 Christopher Braun |    9323160
+ Estados Unidos |   49 |                  Katherine Taylor |    3311880
+ Estados Unidos |   61 |                  Kathryn Robinson |     933240
+ Estados Unidos |   67 |                   William Sanchez |    1302840
+         Mexico |   36 |        Carla Noemí Melgar Narváez |   14273160
+      Argentina |   22 |             Lorenzo Ignacio Gomez |    5959800
+      Argentina |   33 |          Constantino Guzman Lopez |    5765760
+         España |   25 |          Florencio Ribera Tamarit |   10641840
+
+(24 rows)
+
+ actor_id                             | nombre_actor                      | rol        | apariciones | nombre_personaje | produccion
+--------------------------------------+-----------------------------------+------------+-------------+------------------+-----------------
+ 6a01977b-8873-4737-ace4-048f45d6ac42 | Catalina Camila Cáceres Dinamarca |  Principal |           3 |            Sansa | Sansa Ball Race
+ 1e47caa6-1f68-4c50-9e74-d6502980f7bd |       Julio Pierre Tapia Gallardo | Secundario |           1 |            Sansa | Sansa Ball Race
+ 04ab140e-4144-498c-9c48-387188e6823d |                         Brayan Sá | Secundario |           1 |            Sansa | Sansa Ball Race
+ c699d5ef-454b-48f8-9c7e-f9e3caaba2c9 |        Carla Noemí Melgar Narváez |  Principal |           3 |            Sansa | Sansa Ball Race
+ adb21095-3bbb-492b-9924-eb8b75750c2b |  María Julieta Hernández Calderón |  Principal |           3 |            Sansa | Sansa Ball Race
+ 7e9b56d2-f7ca-4132-a960-199b3982dbf3 |                 Christopher Braun | Secundario |           1 |            Sansa | Sansa Ball Race
+ 192f09a9-cfd8-4364-aab4-2bd67528ea79 |                Andy Castro Aliaga |  Principal |           3 |            Sansa | Sansa Ball Race
+ 408e79ea-b3a2-459e-8f15-79f2445db505 |          Florencio Ribera Tamarit |  Principal |           3 |            Sansa | Sansa Ball Race
+ 44a23f65-9015-47c2-8b71-779491e0b539 |         Mia Ana Alarcón Rodríguez |  Principal |           3 |            Sansa | Sansa Ball Race
+ 951765da-b212-4b56-9945-2ba0d98d4098 |        Daniel Joaquín Villar Mena | Secundario |           1 |            Sansa | Sansa Ball Race
+ 40fc7f1b-5dbe-45b9-8f17-6b347b0dc700 |                  Julie Richardson |  Principal |           3 |            Sansa | Sansa Ball Race
+ 45e8f721-e301-4e25-b5cf-ef7f85616709 |                  Katherine Taylor | Secundario |           1 |            Sansa | Sansa Ball Race
+ 2e608e3d-5c2e-4826-96f0-a1e4a91a562e |          Constantino Guzman Lopez |  Principal |           3 |            Sansa | Sansa Ball Race
+ 3f87175d-9c2a-4dc0-9978-98f0277b5be5 | Alejandro Benavides-Gálvez Molina | Secundario |           1 |            Sansa | Sansa Ball Race
+ fd6cb580-ce21-426c-9b0c-6bb0cd3e91d5 |                   William Sanchez | Secundario |           1 |            Sansa | Sansa Ball Race
+ 0dbb8889-b167-444f-afc3-2fd32b155455 |                 Melanie Gutierrez | Secundario |           1 |            Sansa | Sansa Ball Race
+ 7b9b3410-61b1-46f2-972e-6a6d79ef801b |                  Kathryn Robinson | Secundario |           1 |            Sansa | Sansa Ball Race
+ 38ca6b4a-f85e-4bea-8eec-8bf97875a42b |                  Uberlinda Lizana | Secundario |           1 |            Sansa | Sansa Ball Race
+ e7a82c20-e5e6-4f0c-9dd2-84e869616452 |     María Patricia González Silva | Secundario |           1 |            Sansa | Sansa Ball Race
+ 22867c53-f000-4394-b870-e4e1b093e3b4 |       Rosa Angélica Uribe Álvarez |  Principal |           3 |            Sansa | Sansa Ball Race
+ 8a89cf79-4b98-4f0b-8afc-59d6e61f1bf9 |    Sergio Anderson Osorio Bastías | Secundario |           1 |            Sansa | Sansa Ball Race
+ a826c069-910a-4842-be37-2c51711166cd |             Lorenzo Ignacio Gomez |  Principal |           3 |            Sansa | Sansa Ball Race
+ 8c53765f-4ec0-4954-bf8b-2a6aab74fe57 |     Josefa Brenda Alarcón Álvarez |  Principal |           3 |            Sansa | Sansa Ball Race
+ 5479cbec-27e4-47b1-9878-c0bffb8ac7f1 |                       Terri Clark |  Principal |           3 |            Sansa | Sansa Ball Race
+
+(24 rows)
+
+ count
+-------
+    90
+
+(1 rows)
+
+Warnings :
+Aggregation query used without partition key
+
