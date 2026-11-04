@@ -1,0 +1,249 @@
+\documentclass[11pt,a4paper]{article}
+
+% Codificacion, idioma y tipografia
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish, es-nodecimaldot]{babel}
+\usepackage{lmodern}
+
+% Pagina y elementos visuales
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{amsmath}
+
+% Codigo y enlaces
+\usepackage{listings}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{codebg}{RGB}{245,247,250}
+\definecolor{codecomment}{RGB}{70,110,70}
+\definecolor{codekeyword}{RGB}{35,75,150}
+
+\lstdefinelanguage{CQL}{
+	morekeywords={SELECT,FROM,WHERE,AND,LIMIT,ORDER,BY,ASC,DESC,CREATE,KEYSPACE,
+		TABLE,INDEX,ON,USING,WITH,PRIMARY,KEY,CLUSTERING,INSERT,INTO,VALUES,
+		USE,TRACING,ALLOW,FILTERING,CONTAINS,STATIC,DESCRIBE,UPDATE,SET,DROP,
+		CONSISTENCY,text,int,uuid,date,bigint,set},
+	sensitive=false,
+	morecomment=[l]{--},
+	morestring=[b]'
+}
+
+\lstset{
+	language=CQL,
+	inputencoding=utf8,
+	extendedchars=true,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{codekeyword}\bfseries,
+	commentstyle=\color{codecomment},
+	backgroundcolor=\color{codebg},
+	frame=single,
+	rulecolor=\color{black!20},
+	breaklines=true,
+	keepspaces=true,
+	columns=fullflexible,
+	showstringspaces=false,
+	numbers=left,
+	numberstyle=\tiny\color{black!50},
+	xleftmargin=1.5em,
+	framexleftmargin=1.2em,
+	literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+	          {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+	          {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
+	          {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\setlist{nosep}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Bases de Datos Avanzadas}
+\rhead{Tarea 3: Neo4j}
+\cfoot{\thepage}
+\setlength{\headheight}{14pt}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	\vspace*{1cm}
+	{\Large Universidad Técnica Federico Santa María\\}
+	{\large Campus Santiago San Joaquín\\[0.3em]
+	Bases de Datos Avanzadas\\[3cm]}
+	{\Huge\bfseries Tarea 3: Neo4j\\[1.5cm]}
+	{\Large Informe\par}
+	\vfill
+	\begin{tabular}{rl}
+		\textbf{Nombre:} & Sebastián Andrés Santander Martínez\\
+		\textbf{Rol:} & 202373608-2\\[0.5em]
+		\textbf{Nombre:} & Jaime Guzmán Muñoz\\
+		\textbf{Rol:} & 202373524-8\\
+	\end{tabular}
+	\vfill
+	Segundo semestre 2026
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+
+En este informe se repite el caso de Voice Managers de la tarea anterior, pero ahora sobre
+Apache Cassandra. La diferencia principal con MongoDB es que en Cassandra las tablas se
+diseñan a partir de las consultas que va a hacer la aplicación.
+
+Se trabajó con un clúster de tres nodos levantado con Docker, un keyspace con factor de
+replicación 3 y tres tablas pensadas para las consultas pedidas. Sobre eso se analizaron las
+consultas con \texttt{TRACING}, se probó \texttt{ALLOW FILTERING}, se crearon índices SAI y
+se comparó la desnormalización con el uso de índices.
+
+Los archivos de la tarea (\texttt{schema.cql}, el script de generación de datos, las
+consultas y las capturas) están en el repositorio público
+\url{https://github.com/Sxbayb/Tareas-BDDA}.
+
+\section{Preparación del entorno}
+
+\subsection{Instalación de Neo4j y carga de datos}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{img/creacionInstancia.png}
+	\caption{Creación de la instancia y carga de archivo dump.}
+	\label{fig:compose}
+\end{figure}
+
+\subsection{Instalación y verificación GDS}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{img/gdsVersion.png}
+	\caption{Descarga y comprobación de versión de GDS.}
+	\label{fig:compose}
+\end{figure}
+
+\subsection{Verificación de carga}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{img/consultasVerificacion.png}
+	\caption{Descarga y comprobación de versión de GDS.}
+	\label{fig:compose}
+\end{figure}
+
+\section{Exploración y consultas Cypher}
+\subsection{Visualización e interpretación del grafo}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{img/test.png}
+	\caption{Descarga y comprobación de versión de GDS.}
+	\label{fig:compose}
+\end{figure}
+En el grafo presentado se pueden observar dos tipos de nodos. El primer tipo de nodo que se puede ver son los 
+\textbf{nodos de estudiantes}(nodos azules) los cuales representan a cada uno de los 15 estudiantes del curso
+que salieron a pedir dulces. Su propiedad principal es \texttt{id}, la cual almacena como \texttt{strings} el
+nombre del estudiante. El otro tipo de nodo que se puede ver son los \textbf{nodos de las casas}(nodos rosados)
+los cuales representan cada una de las 10 casas disponibles para pedir dulces. Posee un \texttt{id} numérico
+interno y una propiedad \texttt{direccion} que contiene su nombre temático.
+
+
+Se puede apreciar en el grafo como se tienen relaciones dirigidas, el sentido que se puede apreciar es que la dirección 
+va siempre desde un \textbf{nodo estudiante} a un \textbf{nodo casa}. Cada relación refleja la acción física y semántica
+de la actividad: es el estudiante quien actúa como emisor u origen de la visita, desplazándose hacia la casa como lugar 
+de destino. Una arista representa el hecho de que ese estudiante visitó esa casa específica, independientemente de siempre
+recibió o no dulces.
+
+Cada relación \texttt{PIDIO\_DULCES} almacena dos propiedades:
+\begin{itemize}
+	\item \texttt{cantidad}: Representa el número de dulces obtenidos en esa visita puntual. Puede ser 0 (no recibe dulces), 1 (recibió un dulce) o 2 (recibió dos dulces).
+	\item \texttt{tipo}: Registra la variedad del dulce recibido, toma valor \texttt{'Ninguno'} en caso de que la \texttt{cantidad} sea 0.
+\end{itemize}
+
+En teoría de grafos, un grafo es bipartito si un conjunto de vértices $V$ puede dividirse en dos subconjuntos 
+disjuntos e independientes, tales que toda arista de $E$ conecta un vértice de $V_1$ con uno de $V_2$. En este modelo
+es posible apreciar como tenemos todos los nodos particionados en dos clases independientes: $V_1=\text{Estudiantes}$ y
+$V_2=\text{Casas}$. Además, todas las relaciones van exclusivamente entre un elemento de $V_1$ y un elemento de $V_2$. 
+Por último, no hay ninguna relación que conecte a un estudiante con otro estudiante, ni existe ninguna relación que conecte
+una casa con otra casa.
+
+Por estas razones es posible decir que el grafo con el que se está trabajando es un grafo bipartito.
+
+\subsection{Casa con más visitas}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/ranking10casas.png}
+	\caption{Ranking de las 10 casas con más visitas.}
+	\label{fig:compose}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/empateCasas.png}
+	\caption{Empate en casas con más visitas.}
+	\label{fig:compose}
+\end{figure}
+
+Para este contexto se debe considerar una visita que tenga \texttt{cantidad=0} ya que la existencia de la relación dirigida
+representa el hecho de que un estudiante se trasladó y visitó esa casa puntual durante Halloween. La relación existe independiente
+del resultado de la interacción. El hecho de que la propiedad \texttt{cantidad} tome un valor de 0 modela una visita infructuosa
+(por ejemplo, nadie atendió la puerta o ya no habían dulces), pero la casa efectivamente fue visitada por el estudiante. Como se
+pide medir la afluencia de visitas recibidas por la casa, sería un error descartar la arista o solo sumar los dulces entregados
+por una casa, ya que eso mediría el inventario de dulces entregadas y no el tráfico de personas que acudieron al lugar.
+
+\subsection{Estudiante con más dulces}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/ranking10estudiantes.png}
+	\caption{Ranking de los 10 estudiantes con más dulces.}
+	\label{fig:compose}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/empateEstudiantes.png}
+	\caption{Estudiante con más dulces.}
+	\label{fig:compose}
+\end{figure}
+
+Contar las visitas es una métrica estructural que mide el grado de salida del estudiante en el grafo, reflejando únicamente la 
+cantidad de aristas o conexiones que posee. En cambio, sumar dulces cuantifica el valor acumulado de una propiedad numérica
+propia de cada relación. Dado que cada visita puede otorgar 0, 1 y 2 dulces, contar aristas solo indica el número de lugares 
+concurridos, más no el beneficio o recompensa total obtenida.
+
+El modelo fija como regla que cada estudiante visita exactamente 5 casas distintas, por lo que el conteo estructural de visitas
+es idéntico para todos. No obstante, el resultado de cada visita es independiente y asinga valores de 0, 1 y 2 dulces de forma
+estocástica. Debido a esta variabilidad en la propiedad \texttt{cantidad}, la suma total de cada alumno puede variar dentro del
+rango de 0 a 10 dulces, produciendo totales finales distintos a pesar de tener la misma cantidad de visitas.
+
+\subsection{Visitas sin dulces}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/visitasCantidad0.png}
+	\caption{Visitas sin dulces.}
+	\label{fig:compose}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{img/porcentajeSinDulces.png}
+	\caption{Porcentaje de visitas sin dulces.}
+	\label{fig:compose}
+\end{figure}
+
+Durante la generación de la base de datos, la asignación de dulces en cada visita se modeló como un experimento estocástico 
+independiente con una probabilidad teórica del 20\% para el resultado \texttt{cantidad=0}. La discrepancia entre el porcentaje
+real observado en la consulta (16\%) y dicho 20\% se fundamenta en principios estadísticos y en el tamaño de la muestra:
+\begin{itemize}
+	\item \textbf{Muestra finita y variabilidad muestral:} La base registra un universo total de exactamente 75 visitas. Según la ley de los grandes números, la frecuencia relativa observada de un evento converge a su probabilidad teórica únicamente cuando el número de repeticiones tiende a infinito. En un conjunto acotado de 75 eventos, el 20\% representa una esperanza matemática de $75\times0.20=15$ visitas teóricas, más no una cota determinista o forzada.
+	\item \textbf{Independencia de los eventos generados:} Cada visita fue asignada de forma pseudoaleatoria e independiente. El algoritmo no aplicó cuotas rígidas para asegurar que exactamente 15 de las 75 relaciones tuvieran valor cero, por lo que cualquier fluctuación observada en torno a la media esperada constituye una desviación muestral natural y propia de un proceso probabilístico discreto.
+\end{itemize}
+
+\end{document}
